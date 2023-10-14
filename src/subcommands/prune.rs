@@ -48,10 +48,9 @@ impl PruneCommand {
 
                 log::info!("Start pruning features of dependency {dep_name}.");
 
-                match toml.replace_dependency_features(
-                    &dep_name,
-                    diff.cloned().collect::<Vec<String>>(),
-                ) {
+                match toml
+                    .replace_dependency_features(&dep_name, diff.cloned().collect::<Vec<String>>())
+                {
                     Ok(_) => {}
                     Err(e) => {
                         log::error!(
