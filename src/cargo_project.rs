@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{BTreeMap, HashSet},
     fs::{self, File},
     io::{Read, Write},
     path::Path,
@@ -12,6 +12,7 @@ use cargo::{
         Shell, Verbosity, Workspace,
     },
     ops::{CompileFilter, CompileOptions},
+    util::config::JobsConfig,
     Config,
 };
 use cargo_metadata::Metadata;
@@ -156,7 +157,7 @@ impl CargoProject {
         // Pass custom target if configured.
         compile_options.build_config = BuildConfig::new(
             &config,
-            self.config.parallel_build_jobs,
+            self.config.parallel_build_jobs.map(JobsConfig::Integer),
             false,
             self.config.build_target.as_slice(),
             CompileMode::Build,
@@ -304,7 +305,7 @@ impl CargoProject {
                 fn gather_manual_selected_features(
                     permutation_features: &mut HashSet<String>,
                     manual_selected_features: &HashSet<String>,
-                    dependency_features: &HashMap<String, Vec<String>>,
+                    dependency_features: &BTreeMap<String, Vec<String>>,
                 ) {
                     for manual_selected_feature in manual_selected_features {
                         if let Some(custom_feature_list) =
@@ -328,7 +329,7 @@ impl CargoProject {
 
                 fn gather_default_enabled_features(
                     permutation_features: &mut HashSet<String>,
-                    dependency_features: &HashMap<String, Vec<String>>,
+                    dependency_features: &BTreeMap<String, Vec<String>>,
                 ) {
                     if let Some(default_features) = dependency_features.get("default") {
                         for default_feature in default_features {
